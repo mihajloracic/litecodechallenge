@@ -25,6 +25,7 @@ while cap.isOpened():
     #selected_regions = roi.select_roi1(firstFrame.copy(),img)
 
     cv2.imshow('g',selected_regions)
-    cv2.waitKey(1)
+    if cv2.waitKey(1) & 0xFF == ord('q'):
+        break
 cap.release()
 cv2.destroyAllWindows()

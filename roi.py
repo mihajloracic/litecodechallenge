@@ -7,7 +7,7 @@ plt.ion()
 
 def resize_region(region):
     '''Transformisati selektovani region na sliku dimenzija 28x28'''
-    return cv2.resize(region,(28,28), interpolation = cv2.INTER_NEAREST)
+    return cv2.resize(region,(20,20), interpolation = cv2.INTER_NEAREST)
 
 
 def select_roi(image):
@@ -22,13 +22,16 @@ def select_roi(image):
 
         (x, y), radius = cv2.minEnclosingCircle(c)
         center = (int(x), int(y))
+        x=int(x)
+        y=int(y)
         radius = int(radius)
         if radius < 20 and radius>7:
-            cv2.circle(image, center, radius, (0, 255, 0), 2)
+                #cv2.circle(image, center, radius, (0, 255, 0), 2)
+                cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
+                print(radius);
+                cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
+                crop_img = image[y-radius-1:y + radius+1, x-radius-1:x + radius+1]
 
-        # show the ima
-        # cv2.imshow("Image", image)
-        # cv2.waitKey(0)
     return image
 
 def scale_to_range(image): # skalira elemente slike na opseg od 0 do 1
