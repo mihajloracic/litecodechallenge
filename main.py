@@ -3,7 +3,7 @@ import cv2
 import line_detection as l
 import matplotlib.pyplot as plt
 import roi
-cap = cv2.VideoCapture('videos/video-3.avi')
+cap = cv2.VideoCapture('videos/video-2.avi')
 
 ret, firstFrame = cap.read()
 
@@ -24,7 +24,7 @@ while cap.isOpened():
     selected_regions = roi.select_roi(firstFrame.copy())
     #selected_regions = roi.select_roi1(firstFrame.copy(),img)
 
-    cv2.imshow('g',selected_regions)
+    #cv2.imshow('g',selected_regions)
     if cv2.waitKey(1) & 0xFF == ord('q'):
         break
 cap.release()

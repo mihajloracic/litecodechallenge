@@ -1,7 +1,7 @@
 import cv2
 import numpy as np
 import matplotlib.pyplot as plt
-import imutils
+import neural_network_predict as pred
 
 plt.ion()
 
@@ -27,12 +27,24 @@ def select_roi(image):
         radius = int(radius)
         if radius < 20 and radius>7:
                 #cv2.circle(image, center, radius, (0, 255, 0), 2)
-                cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
-                print(radius);
-                cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
-                crop_img = image[y-radius-1:y + radius+1, x-radius-1:x + radius+1]
-
+                #cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
+                #cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
+                region = image[y-radius : y+radius, x-radius : x+radius]
+                predict(region)
     return image
+
+def predict(region):
+    gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+    scale = scale_to_range(gray)
+    resized = resize_region(scale)
+    img = cv2.copyMakeBorder(
+        resized, 4, 4, 4, 4, cv2.BORDER_CONSTANT, value=[0, 0, 0])
+    cv2.imshow('region', img)
+    cv2.waitKey(100000)
+    print(pred.predict(img))
+    #gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
+    #ret, t = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
+
 
 def scale_to_range(image): # skalira elemente slike na opseg od 0 do 1
     ''' Elementi matrice image su vrednosti 0 ili 255.
