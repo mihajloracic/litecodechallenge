@@ -3,10 +3,11 @@ import numpy as np
 
 n=10000
 
-def get_green(firstFrame):
+def get_green(firstFrame1):
     # cv2.imshow('g',firstFrame)
     # cv2.waitKey(n)
 
+    firstFrame = firstFrame1.copy()
     #ignorisanje plave boje
     firstFrame[:, :, 0] = 0
 
@@ -23,7 +24,7 @@ def get_green(firstFrame):
     maxLineGap = 10
     lines = cv2.HoughLinesP(t, 1, np.pi / 180, 100, minLineLength, maxLineGap)
 
-    print('zelene ' + len(lines).__str__())
+    print('zelene ' + str(len(lines)))
 
     # for i in range(len(lines)):
     #     for x1, y1, x2, y2 in lines[i]:
@@ -31,11 +32,17 @@ def get_green(firstFrame):
     #
     # cv2.imshow('g',firstFrame)
     # cv2.waitKey(n)
+    x1 = min(lines[:, 0, 0])
+    y1 = max(lines[:, 0, 1])
+    x2 = max(lines[:, 0, 2])
+    y2 = min(lines[:, 0, 3])
+    return [(x1, y1), (x2, y2)]
 
-def get_blue(firstFrame):
+def get_blue(firstFrame1):
     # cv2.imshow('g',firstFrame)
     # cv2.waitKey(n)
     #ignorisanje zelene boje
+    firstFrame = firstFrame1.copy()
     firstFrame[:, :, 1] = 0
 
     # cv2.imshow('g',firstFrame)
@@ -51,12 +58,10 @@ def get_blue(firstFrame):
     maxLineGap = 10
     lines = cv2.HoughLinesP(t, 1, np.pi / 180, 100, minLineLength, maxLineGap)
 
-    print('plave ' + len(lines).__str__())
+    print('plave ' + str(len(lines)))
 
-    # for i in range(len(lines)):
-    #     for x1, y1, x2, y2 in lines[i]:
-    #         cv2.line(firstFrame, (x1, y1), (x2, y2), (255, 255, 0), 2)
-    #
-    #
-    # cv2.imshow('g',firstFrame)
-    # cv2.waitKey(n)
+    x1 = min(lines[:, 0, 0])
+    y1 = max(lines[:, 0, 1])
+    x2 = max(lines[:, 0, 2])
+    y2 = min(lines[:, 0, 3])
+    return [(x1, y1), (x2, y2)]

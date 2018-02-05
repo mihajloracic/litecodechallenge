@@ -16,7 +16,9 @@ def select_roi(image):
     thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
 
     img, contours, hierarchy = cv2.findContours(
-        thresh.copy(), cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
+        thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    objects = []
 
     for c in contours:
 
@@ -30,8 +32,9 @@ def select_roi(image):
                 #cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
                 #cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
                 region = image[y-radius : y+radius, x-radius : x+radius]
-                predict(region)
-    return image
+                #predict(region)
+                object.append(center,radius)
+    return objects
 
 def predict(region):
     gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
