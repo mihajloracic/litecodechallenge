@@ -4,6 +4,7 @@ from vector import distance,pnt2line
 import numpy as np
 import time
 import neural_network_predict as nnp
+from scipy import ndimage
 
 cc=-1
 def nextId():
@@ -18,31 +19,6 @@ def inRange(r, item, items):
         if (mdist < r):
             retVal.append(obj)
     return retVal
-
-def select_roi(image):
-    gray = cv2.cvtColor(image.copy(), cv2.COLOR_BGR2GRAY)
-    blurred = cv2.GaussianBlur(gray, (5, 5), 0)
-    thresh = cv2.threshold(blurred, 60, 255, cv2.THRESH_BINARY)[1]
-
-    img, contours, hierarchy = cv2.findContours(
-        thresh.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
-    objects = []
-
-    for c in contours:
-
-        (x, y), radius = cv2.minEnclosingCircle(c)
-        center = (int(x), int(y))
-        x = int(x)
-        y = int(y)
-        radius = int(radius)
-        if radius < 20 and radius > 7:
-            # cv2.circle(image, center, radius, (0, 255, 0), 2)
-            # cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
-            # cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
-            region = image[y - radius: y + radius, x - radius: x + radius]
-            objects.append([center, radius, region])
-    return objects
 
 def resenje(path):
 
@@ -80,38 +56,42 @@ def resenje(path):
         img0 = cv2.dilate(img0, kernel)  # cv2.erode(img0,kernel)
         img0 = cv2.dilate(img0, kernel)
 
-        #labeled, nr_objects = ndimage.label(img0)
-        #objects = ndimage.find_objects(labeled)
-        objects = select_roi(img)
-        for i in range(len(objects)):
-            loc = objects[i]
-            (xc, yc) = loc[0]
-            r = loc[1]
-            (dxc, dyc) = (2*r,2*r)
+        labeled, nr_objects = ndimage.label(img0)
+        objects = ndimage.find_objects(labeled)
 
+        for i in range(nr_objects):
+            loc = objects[i]
+            (xc, yc) = ((loc[1].stop + loc[1].start) / 2,
+                        (loc[0].stop + loc[0].start) / 2)
+            (dxc, dyc) = ((loc[1].stop - loc[1].start),
+                          (loc[0].stop - loc[0].start))
+
+            (xc, yc) = (int(xc),int(yc))
+            (dxc, dyc) = (int(dxc), int(dyc))
 
             cv2.circle(img, (xc, yc), 16, (25, 25, 255), 1)
 
-
-            #pred=[1]
-            elem = {'center': (xc, yc), 'size': (dxc, dyc), 't': t}
-            # find in range
-            lst = inRange(30, elem, elements)
-            nn = len(lst)
-            if nn == 0:
-                elem['id'] = nextId()
-                elem['t'] = t
-                elem['bluePass'] = False
-                elem['greenPass'] = False
-                pred = nnp.predict(loc[2])
-                elem['history'] = [{'center': (xc, yc), 'size': (dxc, dyc), 't': t}]
-                elem['value'] = pred
-                elements.append(elem)
-            elif nn == 1:
-                lst[0]['center'] = elem['center']
-                lst[0]['t'] = t
-                #lst[0]['value'] = elem['value']
-                lst[0]['history'].append({'center': (xc, yc), 'size': (dxc, dyc), 't': t})
+            if (dxc > 11 or dyc > 11):
+                cv2.circle(img, (xc, yc), 16, (25, 25, 255), 1)
+                elem = {'center': (xc, yc), 'size': (dxc, dyc), 't': t}
+                # find in range
+                lst = inRange(20, elem, elements)
+                nn = len(lst)
+                if nn == 0:
+                    elem['id'] = nextId()
+                    elem['t'] = t
+                    elem['bluePass'] = False
+                    elem['greenPass'] = False
+                    elem['history'] = [{'center': (xc, yc), 'size': (dxc, dyc), 't': t}]
+                    (x, y) = (loc[1].start,loc[0].start)
+                    pred = nnp.predict(img[y:y+dyc,x:x+dxc])
+                    elem['value'] = pred
+                    elements.append(elem)
+                elif nn == 1:
+                    lst[0]['center'] = elem['center']
+                    lst[0]['t'] = t
+                    lst[0]['history'].append({'center': (xc, yc), 'size': (dxc, dyc), 't': t})
+                    lst[0]['future'] = []
 
 
         for el in elements:
@@ -121,27 +101,21 @@ def resenje(path):
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
-                    if (dist < 15):
+                    if (dist < 9):
                         c = (0, 255, 160)
                         if el['bluePass'] == False:
                             el['bluePass'] = True
-                            #valueHistory = [a['value'][0] for a in el['history']]
-                            #counter += np.argmax(np.bincount(valueHistory))
                             counter += el['value'][0]
-                            #print('+' + str(np.argmax(np.bincount(valueHistory))))
 
                 dist, pnt, r = pnt2line(el['center'], greenLine[1], greenLine[0])
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
-                    if (dist < 15):
+                    if (dist < 9):
                         c = (0, 255, 160)
                         if el['greenPass'] == False:
                             el['greenPass'] = True
-                            #valueHistory = [a['value'][0] for a in el['history']]
-                            #counter -= np.argmax(np.bincount(valueHistory))
                             counter -= el['value'][0]
-                            #print ('-' + str(np.argmax(np.bincount(valueHistory))))
 
                 cv2.circle(img, el['center'], 16, c, 2)
 
@@ -174,6 +148,5 @@ def resenje(path):
     cv2.destroyAllWindows()
 
     et = np.array(times)
-    print('a')
     return counter
 
