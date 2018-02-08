@@ -173,11 +173,11 @@ def resenje(path):
         if t % 10 == 0:
             print
             t
-        cv2.imshow('frame', img)
-        k = cv2.waitKey(30) & 0xff
-        if k == 27:
-           break
-        out.write(img)
+        # cv2.imshow('frame', img)
+        # k = cv2.waitKey(30) & 0xff
+        # if k == 27:
+        #    break
+        # out.write(img)
     out.release()
     cap.release()
     cv2.destroyAllWindows()
