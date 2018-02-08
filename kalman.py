@@ -20,6 +20,30 @@ def inRange(r, item, items):
             retVal.append(obj)
     return retVal
 
+def predict(img):
+    # denoised = cv2.fastNlMeansDenoisingColored(
+    #     img, h=18,hColor=25, searchWindowSize=21, templateWindowSize=7)
+    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    #cv2.imshow('a',gray)
+    #cv2.waitKey(10000)
+    ret, thresh1 = cv2.threshold(gray, 175, 255, cv2.THRESH_BINARY)
+    #cv2.imshow('a', thresh1)
+    #cv2.waitKey(10000)
+    im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    if(not contours):
+        return -1
+    c = max(contours, key=cv2.contourArea)
+
+    x, y, w, h = cv2.boundingRect(c)
+    rect = thresh1[y:y + h, x:x + w]
+
+    final = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_NEAREST)
+
+    val = nnp.predict(final)
+
+    return val
+
 def resenje(path):
 
     cap = cv2.VideoCapture(path)
@@ -77,20 +101,25 @@ def resenje(path):
                 # find in range
                 lst = inRange(20, elem, elements)
                 nn = len(lst)
+                (x, y) = (loc[1].start, loc[0].start)
                 if nn == 0:
                     elem['id'] = nextId()
                     elem['t'] = t
                     elem['bluePass'] = False
                     elem['greenPass'] = False
-                    elem['history'] = [{'center': (xc, yc), 'size': (dxc, dyc), 't': t}]
-                    (x, y) = (loc[1].start,loc[0].start)
-                    pred = nnp.predict(img[y:y+dyc,x:x+dxc])
+                    pred = predict(img[y: y + dyc, x: x + dxc])
+                    elem['history'] = [{'center': (xc, yc), 'size': (dxc, dyc), 't': t, 'val': pred}]
                     elem['value'] = pred
                     elements.append(elem)
                 elif nn == 1:
+                    if (t % 10 == 0):
+                        pred = predict(img[y: y + dyc, x: x + dxc])
+                    else:
+                        pred = -1
+                    lst[0]['value'] = pred
                     lst[0]['center'] = elem['center']
                     lst[0]['t'] = t
-                    lst[0]['history'].append({'center': (xc, yc), 'size': (dxc, dyc), 't': t})
+                    lst[0]['history'].append({'center': (xc, yc), 'size': (dxc, dyc), 't': t,'val': pred})
                     lst[0]['future'] = []
 
 
@@ -105,7 +134,10 @@ def resenje(path):
                         c = (0, 255, 160)
                         if el['bluePass'] == False:
                             el['bluePass'] = True
-                            counter += el['value'][0]
+                            valueHistory = [a['val'] for a in el['history']]
+                            history = [a[0] for a in valueHistory if a != -1]
+                            val = np.argmax(np.bincount(history))
+                            counter += val
 
                 dist, pnt, r = pnt2line(el['center'], greenLine[1], greenLine[0])
                 c = (25, 25, 255)
@@ -115,7 +147,10 @@ def resenje(path):
                         c = (0, 255, 160)
                         if el['greenPass'] == False:
                             el['greenPass'] = True
-                            counter -= el['value'][0]
+                            valueHistory = [a['val'] for a in el['history']]
+                            history = [a[0] for a in valueHistory if a != -1]
+                            val = np.argmax(np.bincount(history))
+                            counter -= val
 
                 cv2.circle(img, el['center'], 16, c, 2)
 
@@ -138,11 +173,11 @@ def resenje(path):
         if t % 10 == 0:
             print
             t
-        # cv2.imshow('frame', img)
-        # k = cv2.waitKey(30) & 0xff
-        # if k == 27:
-        #    break
-        # out.write(img)
+        cv2.imshow('frame', img)
+        k = cv2.waitKey(30) & 0xff
+        if k == 27:
+           break
+        out.write(img)
     out.release()
     cap.release()
     cv2.destroyAllWindows()

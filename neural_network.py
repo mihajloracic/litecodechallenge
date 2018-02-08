@@ -8,6 +8,21 @@ from keras.layers.convolutional import Conv2D
 from keras.layers.convolutional import MaxPooling2D
 from keras.utils import np_utils
 from keras import backend as K
+import cv2
+
+
+def preprocess(img):
+    ret, thresh1 = cv2.threshold(img, 50, 255, cv2.THRESH_BINARY)
+    im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+
+    c = max(contours, key=cv2.contourArea)
+
+    x, y, w, h = cv2.boundingRect(c)
+    rect = thresh1[y:y+h,x:x+w]
+
+    final = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_NEAREST)
+
+    return final
 
 K.set_image_dim_ordering('th')
 
@@ -18,13 +33,19 @@ numpy.random.seed(seed)
 (X_train, y_train), (X_test, y_test) = mnist.load_data()
 # reshape to be [samples][pixels][width][height]
 print(X_train.shape)
-X_train = X_train.reshape(X_train.shape[0], 1, 28, 28).astype('float32')
-X_test = X_test.reshape(X_test.shape[0], 1, 28, 28).astype('float32')
+print(X_train[0].size)
+for i in range(len(X_train)):
+    X_train[i] = preprocess(X_train[i])
+
+for i in range(len(X_test)):
+    X_test[i] = preprocess(X_test[i])
 
 # normalize inputs from 0-255 to 0-1
 X_train = X_train / 255
 X_test = X_test / 255
 # one hot encode outputs
+X_train = X_train.reshape(X_train.shape[0],1,28,28)
+X_test = X_test.reshape(X_test.shape[0],1,28,28)
 y_train = np_utils.to_categorical(y_train)
 y_test = np_utils.to_categorical(y_test)
 num_classes = y_test.shape[1]
