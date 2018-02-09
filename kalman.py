@@ -31,6 +31,7 @@ def predict(img):
     #sa 204 70.48192771084337
     #to do 207
     ret, thresh1 = cv2.threshold(gray, 203, 255, cv2.THRESH_BINARY)
+
     #cv2.imshow('a', thresh1)
     #cv2.waitKey(10000)
     im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -155,6 +156,7 @@ def resenje(path):
                             history = [a[0] for a in valueHistory if a != -1]
                             val = np.argmax(np.bincount(history))
                             counter -= val
+                            print('-' + str(val))
 
                 cv2.circle(img, el['center'], 16, c, 2)
 
@@ -185,7 +187,19 @@ def resenje(path):
     out.release()
     cap.release()
     cv2.destroyAllWindows()
+
     print(path)
+
+    # for el in elements:
+    #     valueHistory = [a['val'] for a in el['history']]
+    #     history = [a[0] for a in valueHistory if a != -1]
+    #     val = np.argmax(np.bincount(history))
+    #     if el['greenPass'] == True:
+    #         counter -= val
+    #         print('-' + str(val))
+    #     if el['bluePass'] == True:
+    #         counter += val
+    #         print('-' + str(val))
     print(counter)
     et = np.array(times)
     return counter
