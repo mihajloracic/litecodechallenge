@@ -12,7 +12,7 @@ import cv2
 
 
 def preprocess(img):
-    ret, thresh1 = cv2.threshold(img, 175, 255, cv2.THRESH_BINARY)
+    ret, thresh1 = cv2.threshold(img, 190, 255, cv2.THRESH_BINARY)
     im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     c = max(contours, key=cv2.contourArea)

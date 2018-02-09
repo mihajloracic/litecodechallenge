@@ -26,7 +26,11 @@ def predict(img):
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
     #cv2.imshow('a',gray)
     #cv2.waitKey(10000)
-    ret, thresh1 = cv2.threshold(gray, 175, 255, cv2.THRESH_BINARY)
+    #sa 205 69.277
+    #sa 203 73.49397590361446
+    #sa 204 70.48192771084337
+    #to do 207
+    ret, thresh1 = cv2.threshold(gray, 203, 255, cv2.THRESH_BINARY)
     #cv2.imshow('a', thresh1)
     #cv2.waitKey(10000)
     im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -38,7 +42,7 @@ def predict(img):
     x, y, w, h = cv2.boundingRect(c)
     rect = thresh1[y:y + h, x:x + w]
 
-    final = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_NEAREST)
+    final = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_LINEAR)
 
     val = nnp.predict(final)
 
@@ -99,7 +103,7 @@ def resenje(path):
                 cv2.circle(img, (xc, yc), 16, (25, 25, 255), 1)
                 elem = {'center': (xc, yc), 'size': (dxc, dyc), 't': t}
                 # find in range
-                lst = inRange(20, elem, elements)
+                lst = inRange(18, elem, elements)
                 nn = len(lst)
                 (x, y) = (loc[1].start, loc[0].start)
                 if nn == 0:
@@ -112,7 +116,7 @@ def resenje(path):
                     elem['value'] = pred
                     elements.append(elem)
                 elif nn == 1:
-                    if (t % 10 == 0):
+                    if (t % 1 == 0):
                         pred = predict(img[y: y + dyc, x: x + dxc])
                     else:
                         pred = -1
@@ -130,7 +134,7 @@ def resenje(path):
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
-                    if (dist < 9):
+                    if (dist < 14):
                         c = (0, 255, 160)
                         if el['bluePass'] == False:
                             el['bluePass'] = True
@@ -143,7 +147,7 @@ def resenje(path):
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
-                    if (dist < 9):
+                    if (dist < 14):
                         c = (0, 255, 160)
                         if el['greenPass'] == False:
                             el['greenPass'] = True
@@ -181,7 +185,8 @@ def resenje(path):
     out.release()
     cap.release()
     cv2.destroyAllWindows()
-
+    print(path)
+    print(counter)
     et = np.array(times)
     return counter
 

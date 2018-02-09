@@ -11,5 +11,5 @@ def predict(region):
     # cv2.waitKey(4000)
 
     a = model.predict_classes(region.reshape(1, 1, 28, 28).astype('float32'))
-    print(a)
+    # print(a)
     return a

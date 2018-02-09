@@ -24,7 +24,7 @@ def get_green(firstFrame1):
     maxLineGap = 10
     lines = cv2.HoughLinesP(t, 1, np.pi / 180, 100, minLineLength, maxLineGap)
 
-    print('zelene ' + str(len(lines)))
+    # print('zelene ' + str(len(lines)))
 
     # for i in range(len(lines)):
     #     for x1, y1, x2, y2 in lines[i]:
@@ -58,7 +58,7 @@ def get_blue(firstFrame1):
     maxLineGap = 10
     lines = cv2.HoughLinesP(t, 1, np.pi / 180, 100, minLineLength, maxLineGap)
 
-    print('plave ' + str(len(lines)))
+    # print('plave ' + str(len(lines)))
 
     x1 = min(lines[:, 0, 0])
     y1 = max(lines[:, 0, 1])
