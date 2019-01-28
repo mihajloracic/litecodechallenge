@@ -12,21 +12,21 @@ import cv2
 
 
 def preprocess(img):
-    ret, thresh1 = cv2.threshold(img, 190, 255, cv2.THRESH_BINARY)
-    im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+    ret, thresh = cv2.threshold(img, 190, 255, cv2.THRESH_BINARY)
+    im2, cntrs, hierarchy = cv2.findContours(thresh, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
-    c = max(contours, key=cv2.contourArea)
+    c = max(cntrs, key=cv2.contourArea)
 
     x, y, w, h = cv2.boundingRect(c)
-    rect = thresh1[y:y+h,x:x+w]
+    rect = thresh[y:y+h, x:x+w]
 
-    final = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_NEAREST)
+    retValue = cv2.resize(rect, (28, 28), interpolation=cv2.INTER_NEAREST)
 
-    return final
+    return retValue
 
 K.set_image_dim_ordering('th')
 
-seed = 7
+seed = 15
 numpy.random.seed(seed)
 
 # load data

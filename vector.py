@@ -1,46 +1,46 @@
 import math
 
 
-def dot(v, w):
-    x, y = v
-    X, Y = w
+def dot(a, b):
+    x, y = a
+    X, Y = b
     return x * X + y * Y
 
 
-def length(v):
-    x, y = v
+def length(a):
+    x, y = a
     return math.sqrt(x * x + y * y)
 
 
-def vector(b, e):
-    x, y = b
-    X, Y = e
+def vector(a, b):
+    x, y = a
+    X, Y = b
     return (X - x, Y - y)
 
 
-def unit(v):
-    x, y = v
-    mag = length(v)
-    return (x / mag, y / mag)
+def unit(a):
+    x, y = a
+    l = length(a)
+    return (x / l, y / l)
 
 
-def distance(p0, p1):
-    return length(vector(p0, p1))
+def distance(A, B):
+    return length(vector(A, B))
 
 
-def scale(v, sc):
-    x, y = v
-    return (x * sc, y * sc)
+def scale(a, scalar):
+    x, y = a
+    return (x * scalar, y * scalar)
 
 
-def add(v, w):
-    x, y = v
-    X, Y = w
+def add(a, b):
+    x, y = a
+    X, Y = b
     return (x + X, y + Y)
 
-def pnt2line(pnt, start, end):
-    line_vec = vector(start, end)
-    pnt_vec = vector(start, pnt)
+def point2line(point, A, B):
+    line_vec = vector(A, B)
+    pnt_vec = vector(A, point)
     line_len = length(line_vec)
     line_unitvec = unit(line_vec)
     pnt_vec_scaled = scale(pnt_vec, 1.0/line_len)
@@ -54,5 +54,5 @@ def pnt2line(pnt, start, end):
         r = -1
     nearest = scale(line_vec, t)
     dist = distance(nearest, pnt_vec)
-    nearest = add(nearest, start)
+    nearest = add(nearest, A)
     return (dist, (int(nearest[0]), int(nearest[1])),r)

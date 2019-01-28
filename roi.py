@@ -28,11 +28,6 @@ def select_roi(image):
         y=int(y)
         radius = int(radius)
         if radius < 20 and radius>7:
-                #cv2.circle(image, center, radius, (0, 255, 0), 2)
-                #cv2.rectangle(image, (x - radius, y - radius), (x + radius, y + radius), (0, 255, 0), 2)
-                #cv2.circle(image,(x - radius, y - radius),1,(0, 0, 255), 2)
-                region = image[y-radius : y+radius, x-radius : x+radius]
-                #predict(region)
                 object.append(center,radius)
     return objects
 
@@ -45,8 +40,6 @@ def predict(region):
     cv2.imshow('region', img)
     cv2.waitKey(100000)
     print(pred.predict(img))
-    #gray = cv2.cvtColor(region, cv2.COLOR_BGR2GRAY)
-    #ret, t = cv2.threshold(gray, 25, 255, cv2.THRESH_BINARY)
 
 
 def scale_to_range(image): # skalira elemente slike na opseg od 0 do 1

@@ -1,6 +1,6 @@
 import cv2
 import line_detection as l
-from vector import distance,pnt2line
+from vector import distance,point2line
 import numpy as np
 import time
 import neural_network_predict as nnp
@@ -21,19 +21,10 @@ def inRange(r, item, items):
     return retVal
 
 def predict(img):
-    # denoised = cv2.fastNlMeansDenoisingColored(
-    #     img, h=18,hColor=25, searchWindowSize=21, templateWindowSize=7)
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    #cv2.imshow('a',gray)
-    #cv2.waitKey(10000)
-    #sa 205 69.277
-    #sa 203 73.49397590361446
-    #sa 204 70.48192771084337
-    #to do 207
+
     ret, thresh1 = cv2.threshold(gray, 203, 255, cv2.THRESH_BINARY)
 
-    #cv2.imshow('a', thresh1)
-    #cv2.waitKey(10000)
     im2, contours, hierarchy = cv2.findContours(thresh1, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
     if(not contours):
@@ -131,7 +122,7 @@ def resenje(path):
         for el in elements:
             tt = t - el['t']
             if (tt < 3):
-                dist, pnt, r = pnt2line(el['center'], blueLine[0], blueLine[1])
+                dist, pnt, r = point2line(el['center'], blueLine[0], blueLine[1])
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
@@ -144,7 +135,7 @@ def resenje(path):
                             val = np.argmax(np.bincount(history))
                             counter += val
 
-                dist, pnt, r = pnt2line(el['center'], greenLine[1], greenLine[0])
+                dist, pnt, r = point2line(el['center'], greenLine[1], greenLine[0])
                 c = (25, 25, 255)
                 if r > 0:
                     cv2.line(img, pnt, el['center'], (0, 255, 25), 1)
