@@ -1,4 +1,4 @@
-package org.example.winned.of;
+package org.example.winner.of;
 
 public class Runner {
 

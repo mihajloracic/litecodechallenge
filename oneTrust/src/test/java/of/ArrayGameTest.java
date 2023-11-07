@@ -1,7 +1,7 @@
 package of;
 
-import org.example.winned.of.SimulatorSolution;
-import org.example.winned.of.Solution;
+import org.example.winner.of.SimulatorSolution;
+import org.example.winner.of.Solution;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;

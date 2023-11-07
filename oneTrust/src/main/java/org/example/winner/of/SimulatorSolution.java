@@ -1,4 +1,4 @@
-package org.example.winned.of;
+package org.example.winner.of;
 
 import java.util.ArrayList;
 import java.util.List;
